@@ -21,7 +21,12 @@
         layout="@layout/menu" />
 </androidx.constraintlayout.widget.ConstraintLayout>  -->
 
-
+    <include
+        android:id="@+id/appBar"
+        layout="@layout/maintoolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <ImageView
@@ -30,15 +35,13 @@
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/shoe3"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/appBar"
+        app:srcCompat="@drawable/shoe3" />
 
     <TextView
         android:id="@+id/tvProductDetailName"
@@ -64,7 +67,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvProductDetailName" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/tvRate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -74,13 +77,13 @@
         android:background="@color/colorAccent"
         android:text=" 4.5  "
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
-        app:layout_constraintEnd_toStartOf="@+id/textView4"
+        app:layout_constraintEnd_toStartOf="@+id/tvRateDescription"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/tvRateDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -91,13 +94,13 @@
         android:layout_marginBottom="8dp"
         android:text="Very Good"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
-        app:layout_constraintEnd_toStartOf="@+id/textView5"
+        app:layout_constraintEnd_toStartOf="@+id/tvReviews"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintStart_toEndOf="@+id/tvRate"
         app:layout_constraintTop_toTopOf="@+id/guideline" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/tvReviews"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -110,7 +113,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintStart_toEndOf="@+id/tvRateDescription"
         app:layout_constraintTop_toTopOf="@+id/guideline" />
 
     <TextView

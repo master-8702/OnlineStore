@@ -10,14 +10,15 @@
     <item
         android:id="@+id/filter"
         android:title="Filter"
-        android:icon="@drawable/ic_filter"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        android:icon="@drawable/ic_filter"/>
     <item
         android:id="@+id/cart"
         android:title="Cart"
         android:icon="@drawable/ic_cart"
         app:showAsAction="always"
-        android:actionLayout="@layout/toolbar_notification_icon"/>
+        android:actionLayout="@layout/toolbar_notification_icon"
+        />
     <item
         android:id="@+id/aaa"
         android:title="Options"

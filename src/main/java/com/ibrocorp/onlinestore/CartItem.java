@@ -3,8 +3,6 @@ package com.ibrocorp.onlinestore;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,8 +10,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.ActionMenuView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,20 +20,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.nex3z.notificationbadge.NotificationBadge;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class CartItem extends AppCompatActivity implements com.ibrocorp.onlinestore.MainAdapter.onItemClickListener {
+public class CartItem extends BaseActivity implements com.ibrocorp.onlinestore.MainAdapter.onItemClickListener {
 
     private static final String URL_DATA="https://store-api.glitch.me/api/products";
 
     RecyclerView rv;
-    ArrayList<MainModel> mainmodels;
+    ArrayList<Product> mainmodels;
     MainAdapter mainadapter;
     TextView tv;
     Button btnContinue;
@@ -52,6 +45,7 @@ public class CartItem extends AppCompatActivity implements com.ibrocorp.onlinest
         mainmodels=new ArrayList<>();
         btnContinue=findViewById(R.id.btnContinue);
         loadRecyclerViewData();
+        activateToolbar();
 
      btnContinue.setOnClickListener(new View.OnClickListener() {
          @Override
@@ -79,7 +73,7 @@ public class CartItem extends AppCompatActivity implements com.ibrocorp.onlinest
             public void onResponse(JSONArray response) {
                 progressDialog.dismiss();
 
-                    for (MainModel m:GlobalClass.cartLists) {
+                    for (Product m:GlobalClass.cartLists) {
                         mainmodels.add(m);
                     }
 
@@ -105,26 +99,9 @@ public class CartItem extends AppCompatActivity implements com.ibrocorp.onlinest
         requestQueue.add(jsonArrayRequest);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu,menu);
-        return true;
-    }
-
-
-    public void onClick(View view) {
-        switch (view.getId()){
-
-            case R.id.filter:
-                mainmodels.remove(2);
-                mainadapter.notifyItemRemoved(3);
-                mainadapter.notifyItemRangeChanged(3,mainmodels.size());
-
-
-        }
-    }
 
     @Override
-    public void onItemClick(int position) {
+    public void onItemClick(int position, View view) {
       //  Toast.makeText(CartItem.this,"Index "+position+" is selected",Toast.LENGTH_SHORT).show();
 
             //to remove the clicked item by using the position as the index of the ArrayList

@@ -12,14 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.ActionMenuView;
-import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+import androidx.core.view.MenuItemCompat;
 
-import com.nex3z.notificationbadge.NotificationBadge;
 import com.squareup.picasso.Picasso;
 
 import static com.ibrocorp.onlinestore.MainActivity.EXTRA_CURRENCY;
@@ -27,13 +23,16 @@ import static com.ibrocorp.onlinestore.MainActivity.EXTRA_ID;
 import static com.ibrocorp.onlinestore.MainActivity.EXTRA_NAME;
 import static com.ibrocorp.onlinestore.MainActivity.EXTRA_PRICE;
 import static com.ibrocorp.onlinestore.MainActivity.EXTRA_URL;
-
-public class ProductDetail extends AppCompatActivity implements View.OnClickListener{
-    TextView tv,tv2;
-    ActionMenuView actionMenuView;
+//in this class we will display one specific product that the user wishes to see in detail
+// with bigger product image,Description,rating ... about the product
+public class ProductDetail extends BaseActivity {
+    TextView tv,bagdeCounter;
+    MenuItem menuItem;
     int id; Double price;
     String nom,currency,imageUrl;
     Button btnAddToCart,btnBuyNow;
+    Menu Mmenu;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,12 +42,11 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         tv.setMovementMethod(new ScrollingMovementMethod());
         btnAddToCart=findViewById(R.id.btnAddToCart);
         btnBuyNow=findViewById(R.id.btnBuyNow);
-        tv2=findViewById(R.id.tv_NumberOfCartItems);
+        activateToolbar();
 
-
-       //changed actionmenuview actionMenuView=findViewById(R.id.actionMenuView);
-      // final NotificationBadge nb=findViewById(R.id.id_badge);
-
+        //here we receive the data using savedInsatnces from MainActivity/the first activity().
+        //when the user clicks on a specific product he/she will be redirected to this page with the clicked item details.
+        // and we assign the coming datas to this class views
 
         Intent intent=getIntent();
         id=intent.getIntExtra(EXTRA_ID,-1);
@@ -67,17 +65,22 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         productPrice.setText(price.toString());
         productDescription.setText(R.string.description);
 
+        //here we assign onClickListener on the ADD to Cart button
+        //if the user clicks it we will create a new tempo model of product and fill it with the clicked item data
+        //then we increment the number of items in the Global class
+        //finally updating (refreshing) the Action Bar to reflect the number of items change
         btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 switch (view.getId()) {
                     case R.id.btnAddToCart:
 
-                         MainModel tempModel = new MainModel(id, nom, price, currency, imageUrl);
+                         Product tempModel = new Product(id, nom, price, currency, imageUrl);
                          GlobalClass.setModel(tempModel);
                          GlobalClass.cartItemCounter++;
+                        //This method will help us to refresh (Redraw) the action bar to reflect new changes
+                        supportInvalidateOptionsMenu();
 
-                        invalidateOptionsMenu();
                          Toast.makeText(ProductDetail.this, "Your Item is Added To The Cart", Toast.LENGTH_SHORT).show();
 
             }
@@ -85,42 +88,4 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         });
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu,menu);
-        return true;
-    }
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.cart:
-                if(GlobalClass.cartLists.size() !=0){
-                    Intent i2 = new Intent(ProductDetail.this, CartItem.class);
-                    startActivity(i2);}
-                else Toast.makeText(ProductDetail.this,"Your Cart Is Empty",Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.notification:
-                Toast.makeText(ProductDetail.this, "Notification is selected", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.filter:
-                Toast.makeText(ProductDetail.this, "Filter is selected", Toast.LENGTH_SHORT).show();
-                return  true;
-            default:
-                Toast.makeText(ProductDetail.this, id+" is selected", Toast.LENGTH_SHORT).show();
-                return super.onOptionsItemSelected(item); // the default is false
-
-        }
-
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-
-            case R.id.btnAddToCart:
-//                MainModel tempModel=new MainModel(id,nom,price,currency,imageUrl);
-//
-//                GlobalClass.setMode(tempModel);
-//                Toast.makeText(ProductDetail.this,"Your Item is Added To The Cart",Toast.LENGTH_SHORT).show();
-        }
-    }
 }

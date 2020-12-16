@@ -1,18 +1,20 @@
 package com.ibrocorp.onlinestore;
 
+import android.widget.TextView;
+
 import java.util.ArrayList;
 
 public final class GlobalClass {
 
     public static int cartItemCounter=0;
-    public static ArrayList<MainModel> cartLists=new ArrayList<>();
-    public MainModel mod;
+    public static ArrayList<Product> cartLists=new ArrayList<>();
+    public static TextView notificationCounter;
 
-    public static ArrayList<MainModel> getCartLists() {
+    public static ArrayList<Product> getCartLists() {
         return cartLists;
     }
 
-    public static void setModel(MainModel m){
+    public static void setModel(Product m){
         cartLists.add(m);
     }
 
