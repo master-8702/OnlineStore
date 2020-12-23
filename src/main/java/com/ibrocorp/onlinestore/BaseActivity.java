@@ -10,10 +10,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 // This class is used for doing some common works among all activities.
-//like activating the toolbar, instansiating toolbar items (menu items), handling their click events
+//like activating the toolbar, instantiating toolbar items (menu items), handling their click events
 public class BaseActivity extends AppCompatActivity {
     private Toolbar mToolBar;
-    private TextView tv;
     private Menu Mmenu;
     private MenuItem menuItem;
 
@@ -29,15 +28,12 @@ public class BaseActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                        switch(item.getItemId()){
                            case R.id.cart:
-                               if(GlobalClass.cartLists.size() !=0){
+                           case R.id.iv_cart_icon:
+                           case R.id.tv_NumberOfCartItems:
+                               if(GlobalClass.getCartItemCounter() >0){
                                    Intent i2 = new Intent(BaseActivity.this, CartItem.class);
                                    startActivity(i2);}
                                else Toast.makeText(BaseActivity.this,"Your Cart Is Empty",Toast.LENGTH_SHORT).show();
-                               return true;
-                           case R.id.iv_cart_icon:
-                           case R.id.tv_NumberOfCartItems:
-                               Intent i3 = new Intent(BaseActivity.this, CartItem.class);
-                               startActivity(i3);
                                return true;
                            case R.id.notification:
                                Toast.makeText(BaseActivity.this, "Notification is selected", Toast.LENGTH_SHORT).show();
@@ -76,6 +72,9 @@ public class BaseActivity extends AppCompatActivity {
 //and if is is above zero we will set the action view (toolbar_notification_icon.xml) to the cart icon
 //in order to display the number of items on cart
 //at last we add on click listener on the menu item which is covered by the new action layout.
+// because if we put action layout on it we can no longer use the normal menuItemClickListener
+// that's why we have to set a specific OnClick Listener on that Menu item.
+
         menuItem = menu.findItem(R.id.cart);
         if (GlobalClass.getCartItemCounter() < 1) {
             menuItem.setActionView(null);
@@ -87,8 +86,10 @@ public class BaseActivity extends AppCompatActivity {
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(GlobalClass.getCartItemCounter()>0){
                     Intent intent=new Intent(BaseActivity.this,CartItem.class);
                     startActivity(intent);
+                    }
                 }
             });
         }

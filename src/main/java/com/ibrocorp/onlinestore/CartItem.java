@@ -9,30 +9,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 
 public class CartItem extends BaseActivity implements com.ibrocorp.onlinestore.MainAdapter.onItemClickListener {
 
-    private static final String URL_DATA="https://store-api.glitch.me/api/products";
-
     RecyclerView rv;
-    ArrayList<Product> mainmodels;
+    ArrayList<Product> products ;
     MainAdapter mainadapter;
-    TextView tv;
+    TextView tv,tv_productQuantity,tv_IncreaseProductQuantity,tv_DecreaseProductQuantity;
     Button btnContinue;
 
     @Override
@@ -42,7 +30,10 @@ public class CartItem extends BaseActivity implements com.ibrocorp.onlinestore.M
 
         rv=findViewById(R.id.rvCart);
         tv=findViewById(R.id.tv_NumberOfCartItems);
-        mainmodels=new ArrayList<>();
+        tv_IncreaseProductQuantity=findViewById(R.id.txtincrease);
+        tv_productQuantity=findViewById(R.id.txtquantity);
+        tv_DecreaseProductQuantity=findViewById(R.id.txtdecrease);
+        products =new ArrayList<>();
         btnContinue=findViewById(R.id.btnContinue);
         loadRecyclerViewData();
         activateToolbar();
@@ -52,6 +43,7 @@ public class CartItem extends BaseActivity implements com.ibrocorp.onlinestore.M
          public void onClick(View view) {
              Toast.makeText(CartItem.this,"Your Order Has Been Sent Successfully",Toast.LENGTH_LONG).show();
              GlobalClass.clearCartItemCounter();
+             finish();
              Intent intent=new Intent(CartItem.this,MainActivity.class);
              startActivity(intent);
 
@@ -65,39 +57,16 @@ public class CartItem extends BaseActivity implements com.ibrocorp.onlinestore.M
         progressDialog.setMessage("Loading Data...");
         progressDialog.show();
 
-        //fetching data from the internet using volley
-        RequestQueue requestQueue= Volley.newRequestQueue(this);
-        JsonArrayRequest jsonArrayRequest=new JsonArrayRequest(Request.Method.GET, URL_DATA,null, new Response.Listener<JSONArray>() {
-
-            @Override
-            public void onResponse(JSONArray response) {
-                progressDialog.dismiss();
-
-                    for (Product m:GlobalClass.cartLists) {
-                        mainmodels.add(m);
-                    }
-
+                products.addAll(GlobalClass.getCartLists());
 
                 LinearLayoutManager layoutManger=new LinearLayoutManager(CartItem.this,LinearLayoutManager.VERTICAL,false);
                 rv.setLayoutManager(layoutManger);
                 rv.setItemAnimator(new DefaultItemAnimator());
-                mainadapter=new MainAdapter(CartItem.this,mainmodels,getLocalClassName());
+                mainadapter=new MainAdapter(CartItem.this, products,getLocalClassName());
                 mainadapter.setOnItemClickListener(CartItem.this);
                 rv.setAdapter(mainadapter);
+        progressDialog.dismiss();
             }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressDialog.dismiss();
-                Toast.makeText(CartItem.this,error.getMessage(),Toast.LENGTH_SHORT);
-
-            }
-        });
-        //adding the request string to the request queue
-
-        requestQueue.add(jsonArrayRequest);
-    }
 
 
     @Override
@@ -106,11 +75,11 @@ public class CartItem extends BaseActivity implements com.ibrocorp.onlinestore.M
 
             //to remove the clicked item by using the position as the index of the ArrayList
             //and notifying the adapter about the changes that we made
-            mainmodels.remove(position);
+            products.remove(position);
             mainadapter.notifyItemRemoved(position);
-            mainadapter.notifyItemRangeChanged(position,mainmodels.size());
+            mainadapter.notifyItemRangeChanged(position, products.size());
             GlobalClass.deleteModel(position);   //applying the modification (deletion) of the item on the global class
-
+            supportInvalidateOptionsMenu();
 
 
     }

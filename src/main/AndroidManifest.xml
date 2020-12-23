@@ -11,11 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-     <!-- this was to use (fix) the elegant number counter dependency problem
+     <!-- this was to use (or fix) the elegant number counter dependency problem
       <meta-data tools:replace="android:theme"
             android:name="com.google.android.gms.version"/>   -->
 
-        <activity android:name=".MainActivity">
+<!-- the "android:windowSoftInputMode="stateHidden" thing will help to stop the automatic popup of the keyboard-->
+        <activity android:name=".MainActivity" android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,7 +27,6 @@
 
         </activity>
         <activity android:name=".CartItem" android:label="@string/app_name"/>
-        <activity android:name=".NewTrial" />
     </application>
 
 </manifest>

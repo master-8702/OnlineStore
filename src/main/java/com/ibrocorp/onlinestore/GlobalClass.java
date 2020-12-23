@@ -34,5 +34,6 @@ public final class GlobalClass {
 
     public static void clearCartItemCounter() {
         cartItemCounter=0;
+        cartLists.clear();
     }
 }

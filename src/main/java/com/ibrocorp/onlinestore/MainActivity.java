@@ -1,16 +1,18 @@
 package com.ibrocorp.onlinestore;
 
-import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -24,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
 //this is the main Activity (the first screen) of our app
 public class MainActivity extends BaseActivity implements  MainAdapter.onItemClickListener {
 
@@ -37,7 +40,7 @@ public class MainActivity extends BaseActivity implements  MainAdapter.onItemCli
     ArrayList<Product> products;
     MainAdapter mainadapter;
 
-// here we assign some variables and Recycler views and populate them with initial source of Data
+    // here we assign some variables and Recycler views and populate them with initial source of Data
 // which is Json file on a certain server
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -57,73 +60,97 @@ public class MainActivity extends BaseActivity implements  MainAdapter.onItemCli
 //this method here will fetch the data from the web using volleys library and storing that data on temporary array list
     // finally populating the recycler views from the array list.
     private void loadRecyclerViewData() {
-        //showing the user Loading text until the data from the internet is fetched
-        final ProgressDialog progressDialog=new ProgressDialog(this);
-        progressDialog.setMessage("Loading Data...");
-        progressDialog.show();
 
-        //fetching data from the internet using volley
-        RequestQueue requestQueue= Volley.newRequestQueue(this);   //creating new request queue and JsonArrayRequest object
-        JsonArrayRequest jsonArrayRequest=new JsonArrayRequest(Request.Method.GET, URL_DATA,null, new Response.Listener<JSONArray>() {
 
-            @Override
-            public void onResponse(JSONArray response) {
-                progressDialog.dismiss();  //hiding the text "Loading "
+            //showing the user Loading text until the data from the internet is fetched
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Loading Data...");
+            progressDialog.show();
 
-                try {
-            //here we populate the tempo Arraylist object by iterating through JsonArrayRequest response.
-                    for (int i=0;i<response.length();i++){
-                        JSONObject itemobject=response.getJSONObject(i);
+            //fetching data from the internet using volley
+            final RequestQueue requestQueue = Volley.newRequestQueue(this);   //creating new request queue and JsonArrayRequest object
+            final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, URL_DATA, null, new Response.Listener<JSONArray>() {
 
-                        Product model=new Product(
-                                itemobject.getInt("id"), itemobject.getString("nom"), itemobject.getDouble("price"), itemobject.getString("currency"),
-                                itemobject.getString("imageUrl"));
-                        products.add(model);  //adding each product to the array list
+                @Override
+                public void onResponse(JSONArray response) {
+                    progressDialog.dismiss();  //hiding the text "Loading "
 
+                    try {
+                        //here we populate the tempo Arraylist object by iterating through JsonArrayRequest response.
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject itemobject = response.getJSONObject(i);
+
+                            Product model = new Product(
+                                    itemobject.getInt("id"), itemobject.getString("nom"), itemobject.getDouble("price"), itemobject.getString("currency"),
+                                    itemobject.getString("imageUrl"));
+                            products.add(model);  //adding each product to the array list
+
+                        }
+
+                //here we catch exceptions if they raise during Json object loading
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                     }
+                    //here we assign the orientation of the Linear Layout Manager(horizonatl or vertical)
+                    //this setting will decide the style of the recycler view (Horizontal or vertical scrolling recycler view)
+                    LinearLayoutManager layoutManger = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
+                    rv.setLayoutManager(layoutManger);
+                    rv.setItemAnimator(new DefaultItemAnimator());
+                    //here we pass the products ArrayList and the class name for the adapter.
+                    //the class will help us in the Adapter class (to decide which recycler vies model to inflate for this class)
+                    mainadapter = new MainAdapter(MainActivity.this, products, getLocalClassName());
+                    mainadapter.setOnItemClickListener(MainActivity.this);
+                    rv.setAdapter(mainadapter);
 
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(MainActivity.this,e.getMessage(),Toast.LENGTH_LONG).show();
+                    //here we populate the second recycler view the same as the first one
+                    rv2.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
+                    rv2.setItemAnimator(new DefaultItemAnimator());
+                    rv2.setAdapter(mainadapter);
                 }
-        //here we assign the orientation of the Linear Layout Manager(horizonatl or vertical)
-        //this setting will decide the style of the recycler view (Horizontal or vertical scrolling recycler view)
-                LinearLayoutManager layoutManger=new LinearLayoutManager(MainActivity.this,LinearLayoutManager.HORIZONTAL,false);
-                rv.setLayoutManager(layoutManger);
-                rv.setItemAnimator(new DefaultItemAnimator());
-        //here we pass the products ArrayList and the class name for the adapter.
-        //the class will help us in the Adapter class (to decide which recycler vies model to inflate for this class)
-                mainadapter=new MainAdapter(MainActivity.this, products,getLocalClassName());
-                mainadapter.setOnItemClickListener(MainActivity.this);
-                rv.setAdapter(mainadapter);
+                //here we respond to events like network Error, socket error,no server found ...
 
-        //here we populate the second recycler view the same as the first one
-                rv2.setLayoutManager(new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false));
-                rv2.setItemAnimator(new DefaultItemAnimator());
-                rv2.setAdapter(mainadapter);
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                   progressDialog.dismiss();    //dismissing the loading text and animation
+                     showDialog();              //dispalying Alert Dialog Box to allow users to reconnect after a network failure
+                }
+            });
+            //adding the request string to the request queue (it's like SQL query fro the database)
+            requestQueue.add(jsonArrayRequest);
 
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressDialog.dismiss();
-                Toast.makeText(MainActivity.this,"Can Not Load the Data B",Toast.LENGTH_SHORT).show();
-
-            }
-        });
-        //adding the request string to the request queue (it's like SQL query fro the database)
-        requestQueue.add(jsonArrayRequest);
     }
+//this method will help to allow users to reconnect or exit during a network failure.
+public void showDialog(){
+    AlertDialog.Builder ad=new AlertDialog.Builder(MainActivity.this);
+    ad.setCancelable(false);
+    ad.setTitle("Error Loading");
+    ad.setMessage("Can Not load The Data");
+    ad.setPositiveButton( "Retry", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+        //    Toast.makeText(MainActivity.this, "Retrying ...", Toast.LENGTH_SHORT).show();
+            loadRecyclerViewData();
+        }
+    });
+    ad.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+        //    Toast.makeText(MainActivity.this, "Canceling ...", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+            finishAffinity(); // exit the application
+        }
+    });
+    ad.create().show();
 
-
+}
    //the one we created in the main adapter class
     //in this OnItem Click method we respond by instanciating a Product detail activity and filling with the clicked item values
     //we pass the data using Intents PutExtra methods
     @Override
     public void onItemClick(int position, View view) {
-
     Intent productDetailIntent=new Intent(this,ProductDetail.class);
    Product clickedItem= products.get(position);
         productDetailIntent.putExtra(EXTRA_ID,clickedItem.id);
@@ -134,6 +161,5 @@ public class MainActivity extends BaseActivity implements  MainAdapter.onItemCli
 
         startActivity(productDetailIntent);
     }
-
 
 }
